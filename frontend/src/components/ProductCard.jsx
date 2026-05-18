@@ -14,7 +14,7 @@ function ProductCard({ product }) {
   const navigate =
     useNavigate();
 
-  const avgScore = Math.floor(
+  const avgScore = Math.round(
     (
       (product.scores?.clarity || 0) +
       (product.scores?.discoverability || 0) +

@@ -1,50 +1,259 @@
 const Product = require("../models/Product");
 
-const getProducts = async (req, res) => {
 
-  try {
+const getProducts = async (req,res)=>{
 
-    const products =
-      await Product.find({
-        storeId: req.params.storeId,
-      });
+try{
 
-    res.json(products);
+const products=
+await Product.find({
 
-  } catch (error) {
+storeId:
+req.params.storeId
 
-    res.status(500).json({
-      message: "Failed to fetch products",
-    });
+});
 
-  }
+res.json(products);
+
+}
+catch(error){
+
+res.status(500)
+.json({
+
+message:
+"Failed to fetch products"
+
+});
+
+}
+
 };
 
-const getSingleProduct = async (req, res) => {
-  try {
 
-    const product = await Product.findById(
-      req.params.id
-    );
 
-    if (!product) {
-      return res.status(404).json({
-        message: "Product not found",
-      });
-    }
+const getSingleProduct =
+async(req,res)=>{
 
-    res.json(product);
+try{
 
-  } catch (error) {
+const product=
+await Product.findById(
+req.params.id
+);
 
-    res.status(500).json({
-      message: "Failed to fetch product",
-    });
+if(!product){
 
-  }
+return res.status(404)
+.json({
+
+message:
+"Product not found"
+
+});
+
+}
+
+res.json(product);
+
+}
+catch(error){
+
+res.status(500)
+.json({
+
+message:
+"Failed to fetch product"
+
+});
+
+}
+
 };
 
-module.exports = {
-  getProducts,
-  getSingleProduct,
+
+
+
+const applyAIUpdate=
+async(req,res)=>{
+
+try{
+
+const product=
+await Product.findById(
+req.params.id
+);
+
+if(!product){
+
+return res.status(404)
+.json({
+
+message:
+"Product not found"
+
+});
+
+}
+
+
+
+/* update generated content */
+
+product.title=
+
+product.aiAnalysis
+?.generatedTitle
+||
+product.title;
+
+
+product.description=
+
+product.aiAnalysis
+?.generatedDescription
+||
+product.description;
+
+
+
+/* recalculate scores */
+
+
+const clarity=
+
+Math.min(
+
+100,
+
+product.title.length
++15
+
+);
+
+
+
+const discoverability=
+
+Math.min(
+
+100,
+
+(
+product.aiAnalysis
+?.seoKeywords
+?.length||0
+)
+
+*12
+
+);
+
+
+
+const trust=
+
+Math.min(
+
+100,
+
+(
+product.rating||0
+)
+
+*20
+
+);
+
+
+
+const conversion=
+
+Math.round(
+
+(
+
+clarity+
+
+discoverability+
+
+trust
+
+)/3
+
+);
+
+
+
+product.scores={
+
+clarity,
+
+discoverability,
+
+trust,
+
+conversion
+
+};
+
+
+
+product.overallScore=
+
+Math.round(
+
+(
+
+clarity+
+
+discoverability+
+
+trust+
+
+conversion
+
+)/4
+
+);
+
+
+
+product.aiAnalysis.summary=
+
+"AI improvements applied successfully. Product content optimized and score recalculated.";
+
+
+
+await product.save();
+
+res.json(product);
+
+}
+catch(error){
+
+console.log(error);
+
+res.status(500)
+.json({
+
+message:
+error.message
+
+});
+
+}
+
+};
+
+
+
+module.exports={
+
+getProducts,
+
+getSingleProduct,
+
+applyAIUpdate
+
 };

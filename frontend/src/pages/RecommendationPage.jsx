@@ -208,7 +208,7 @@ function RecommendationPage() {
 
             <p className="text-zinc-600 dark:text-zinc-500 mt-3">
 
-              Gemini is analyzing your store...
+              VYAPARsaarthi is analyzing your store...
 
             </p>
 
@@ -255,7 +255,7 @@ function RecommendationPage() {
 
               <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">
 
-                AI Recommendations
+                Recommendations
 
               </h1>
 
@@ -322,7 +322,7 @@ function RecommendationPage() {
 
               <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
 
-                Store AI Summary
+                Store Summary
 
               </h2>
 

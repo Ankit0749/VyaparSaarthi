@@ -7,49 +7,93 @@ import {
   useParams,
 } from "react-router-dom";
 
-import Sidebar
-from "../components/Sidebar";
+import { Sparkles } from "lucide-react";
+import { Rocket } from "lucide-react";
+import { toast } from "react-hot-toast";
+
+import Sidebar from "../components/Sidebar";
 
 import {
   getSingleProduct,
+  updateProductWithAI,
 } from "../services/productService";
 
 function ProductDetails() {
 
-  const { id } =
-    useParams();
+  const { id } = useParams();
 
-  const [product, setProduct] =
-    useState(null);
-
-  const [loading, setLoading] =
-    useState(true);
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
 
-    const fetchProduct =
-      async () => {
+    const fetchProduct = async () => {
 
-        try {
+      try {
 
-          const data =
-            await getSingleProduct(id);
+        const data = await getSingleProduct(id);
+        setProduct(data);
 
-          setProduct(data);
+      } catch (error) {
 
-        } catch (error) {
+        console.log(error);
 
-          console.log(error);
+      } finally {
 
-        } finally {
-
-          setLoading(false);
-        }
-      };
+        setLoading(false);
+      }
+    };
 
     fetchProduct();
 
   }, [id]);
+
+  const handleApplyAI=
+    async()=>{
+
+    try{
+
+    setUpdating(true);
+
+    const updated=
+    await updateProductWithAI(id);
+
+    setProduct(updated);
+
+    setShowConfirm(false);
+
+    toast.success(
+    "AI improvements applied"
+    );
+
+
+    /* refresh whole app data */
+
+    setTimeout(()=>{
+
+    window.location.reload();
+
+    },800);
+
+    }
+    catch(error){
+
+    console.log(error);
+
+    toast.error(
+    "Update failed"
+    );
+
+    }
+    finally{
+
+    setUpdating(false);
+
+    }
+
+  };
 
   if (loading) {
 
@@ -200,11 +244,7 @@ function ProductDetails() {
 
                 <h3 className="text-2xl font-bold mt-2 text-green-400">
 
-                  {
-                    product.inStock
-                      ? "In Stock"
-                      : "Out of Stock"
-                  }
+                  {product.inStock ? "In Stock" : "Out of Stock"}
 
                 </h3>
 
@@ -243,6 +283,16 @@ function ProductDetails() {
                 </p>
 
               </div>
+
+              {/* APPLY AI BUTTON */}
+
+              <button
+                onClick={() => setShowConfirm(true)}
+                className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-medium hover:scale-105 transition"
+              >
+                <Rocket size={18} />
+                Apply AI Improvements
+              </button>
 
             </div>
 
@@ -448,6 +498,57 @@ function ProductDetails() {
         </div>
 
       </div>
+
+      {/* CONFIRM MODAL */}
+
+      {showConfirm && (
+
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
+
+          <div className="bg-white dark:bg-zinc-900 rounded-3xl w-[450px] p-7 shadow-2xl">
+
+            <h2 className="text-2xl font-bold mb-4">
+
+              Apply AI Improvements?
+
+            </h2>
+
+            <p className="text-zinc-500 leading-8 mb-6">
+
+              This will update:
+              <br />
+              ✅ Product title
+              <br />
+              ✅ Product description
+              <br /><br />
+              Images are managed through Shopify.
+
+            </p>
+
+            <div className="flex justify-end gap-3">
+
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="px-5 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleApplyAI}
+                disabled={updating}
+                className="px-5 py-3 rounded-xl bg-indigo-600 text-white disabled:opacity-60"
+              >
+                {updating ? "Updating..." : "Apply"}
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
 
     </div>
   );

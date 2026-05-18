@@ -476,7 +476,12 @@ function AISimulation() {
             if (msg.type === "ai-empty") {
               return (
                 <AIMessage key={idx}>
-                  <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl rounded-tl-sm px-4 py-4 space-y-3">
+                  <div className="
+                    bg-white dark:bg-zinc-900
+                    border border-zinc-200 dark:border-zinc-800
+                    rounded-2xl rounded-tl-sm
+                    px-4 py-4 space-y-3
+                  ">
                     <p className="text-sm text-zinc-700 dark:text-zinc-300">
                       Simulation complete for{" "}
                       <span className="font-medium text-indigo-600 dark:text-indigo-400">
@@ -484,20 +489,28 @@ function AISimulation() {
                       </span>
                     </p>
 
-                    {/* 78% AI visibility pill + no match label */}
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <div className="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-full px-3 py-1.5">
-                        <Sparkles size={12} className="text-amber-500" />
-                        <span className="text-sm font-bold text-amber-600 dark:text-amber-400">78%</span>
-                        <span className="text-xs text-amber-600 dark:text-amber-400">AI visibility</span>
-                      </div>
-                      <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                        · No products matched this query
-                      </span>
+                    <div className="
+                      flex items-center gap-2
+                      text-sm text-zinc-500 dark:text-zinc-400
+                      border-t border-zinc-100 dark:border-zinc-800
+                      pt-3
+                    ">
+                      <XCircle
+                        size={16}
+                        className="text-red-500"
+                      />
+
+                      No products matched this query
                     </div>
 
-                    <p className="text-xs text-zinc-400 dark:text-zinc-500 leading-relaxed">
-                      Your store has decent AI discoverability but no specific products surfaced for this search. Try improving product descriptions or adding more relevant keywords.
+                    <p className="
+                      text-xs text-zinc-400
+                      dark:text-zinc-500
+                      leading-relaxed
+                    ">
+                      AI couldn't find any relevant products for this search in your store.
+                      Try improving product keywords, categories,
+                      or product descriptions.
                     </p>
                   </div>
                 </AIMessage>

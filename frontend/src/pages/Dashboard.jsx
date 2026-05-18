@@ -481,7 +481,7 @@ const handleDownloadReport =
         <div className="flex items-start justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight transition-colors duration-300">
-              Welcome back, {store?.storeName || "PeakTrail Gear"} 👋
+              Welcome back, {store?.storeName || "PeakTrail Gear"}
             </h1>
             <p className="text-slate-500 dark:text-zinc-400 text-sm transition-colors duration-300">
               Here's what's happening with your store today.

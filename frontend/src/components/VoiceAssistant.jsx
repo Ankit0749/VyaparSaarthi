@@ -1,624 +1,251 @@
 import { useState } from "react";
 
 import {
-Mic,
-MicOff,
-Minimize2,
-Sparkles
-}
-from "lucide-react";
+  Mic,
+  MicOff,
+  Minimize2,
+  Sparkles,
+  StopCircle,
+} from "lucide-react";
 
-import askVoiceAI
-from "../services/voiceService";
+import askVoiceAI from "../services/voiceService";
 
-function VoiceAssistant(){
+function VoiceAssistant() {
 
-const [open,setOpen]=
-useState(false);
+  const [open, setOpen] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [question, setQuestion] = useState("");
+  const [speaking, setSpeaking] = useState(false);
 
-const [listening,setListening]=
-useState(false);
+  const stopSpeaking = () => {
+    window.speechSynthesis.cancel();
+    setSpeaking(false);
+  };
 
-const [loading,setLoading]=
-useState(false);
+  const speak = (msg, userInput = "") => {
 
-const [question,setQuestion]=
-useState("");
+    window.speechSynthesis.cancel();
 
-const speak=(msg,userInput="")=>{
+    msg = msg
+      .replace(/\*\*/g, "")
+      .replace(/\*/g, "")
+      .replace(/#/g, "")
+      .replace(/\n/g, " ");
 
-window.speechSynthesis.cancel();
+    const speech = new SpeechSynthesisUtterance(msg);
 
-msg=
-msg
-.replace(/\*\*/g,"")
-.replace(/\*/g,"")
-.replace(/#/g,"")
-.replace(/\n/g," ");
+    speech.rate = 0.92;
+    speech.pitch = 1;
+    speech.volume = 1;
 
-const speech=
-new SpeechSynthesisUtterance(
-msg
-);
+    const hindiChars = /[\u0900-\u097F]/;
 
-speech.rate=
-0.92;
+    if (hindiChars.test(userInput)) {
+      speech.lang = "hi-IN";
+    } else {
+      speech.lang = "en-IN";
+    }
 
-speech.pitch=
-1;
+    speech.onstart = () => setSpeaking(true);
+    speech.onend = () => setSpeaking(false);
+    speech.onerror = () => setSpeaking(false);
 
-speech.volume=
-1;
+    const applyVoice = () => {
 
+      const voices = window.speechSynthesis.getVoices();
 
-/*
-Language based on what USER spoke
-*/
+      const selectedVoice = voices.find(
+        (v) => v.name === "Google हिन्दी"
+      );
 
-const hindiChars=
-/[\u0900-\u097F]/;
+      if (selectedVoice) {
+        speech.voice = selectedVoice;
+      }
 
-if(
-hindiChars.test(
-userInput
-)
-){
+      window.speechSynthesis.speak(speech);
+    };
 
-speech.lang=
-"hi-IN";
+    const voices = window.speechSynthesis.getVoices();
 
-}else{
+    if (voices.length) {
+      applyVoice();
+    } else {
+      window.speechSynthesis.onvoiceschanged = applyVoice;
+    }
+  };
 
-speech.lang=
-"en-IN";
+  const openAssistant = () => {
+    setOpen(true);
+    speak("Hello, I am your personal store assistant. How can I help you today?");
+  };
 
-}
+  const startListening = () => {
 
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
 
-/*
-KEEP SAME VOICE
-*/
+    const recognition = new SpeechRecognition();
 
-const applyVoice=()=>{
+    recognition.lang = "en-IN";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
-const voices=
-window
-.speechSynthesis
-.getVoices();
+    setListening(true);
 
+    recognition.onresult = async (e) => {
 
-const selectedVoice=
+      const text = e.results[0][0].transcript;
 
-voices.find(
-v=>
-v.name==="Google हिन्दी"
-);
+      setQuestion(text);
 
+      const user = JSON.parse(sessionStorage.getItem("user"));
 
-if(selectedVoice){
+      try {
 
-speech.voice=
-selectedVoice;
+        setLoading(true);
 
-}
+        const data = await askVoiceAI(user.storeId, text);
 
-window
-.speechSynthesis
-.speak(
-speech);
+        if (data) {
+          speak(data.answer, text);
+        }
 
-};
+      } catch (error) {
 
+        console.log(error);
 
-const voices=
-window
-.speechSynthesis
-.getVoices();
+      }
 
-if(
-voices.length
-){
+      setListening(false);
+      setLoading(false);
+    };
 
-applyVoice();
+    recognition.onerror = () => {
+      setListening(false);
+      setLoading(false);
+    };
 
-}else{
+    recognition.onend = () => {
+      setListening(false);
+    };
 
-window
-.speechSynthesis
-.onvoiceschanged=
-applyVoice;
+    recognition.start();
+  };
 
-}
+  return (
 
-};
+    <div className="fixed bottom-6 right-6 z-50">
 
-const openAssistant=
-()=>{
+      {!open && (
 
-setOpen(true);
+        <button
+          onClick={openAssistant}
+          className="h-14 px-5 rounded-full bg-white dark:bg-zinc-900 shadow-xl border border-zinc-200 dark:border-zinc-800 flex items-center gap-3 hover:scale-105 transition-all"
+        >
 
-speak(
+          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 flex items-center justify-center">
+            <Sparkles size={16} className="text-white" />
+          </div>
 
-"Hello, I am your personal store assistant. How can I help you today?"
+          <div className="flex flex-col leading-tight">
+            <span className="font-medium text-zinc-700 dark:text-white">
+              Saarthi Assist
+            </span>
+            <div className="text-[10px] text-slate-500 dark:text-zinc-500 transition-colors duration-300">
+              Your personalized voice assistant
+            </div>
+          </div>
 
-);
+        </button>
 
-};
+      )}
 
+      {open && (
 
+        <div className="w-[320px] bg-white dark:bg-[#171717] rounded-[24px] border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden">
 
-const startListening=()=>{
+          {/* HEADER */}
 
-const SpeechRecognition=
+          <div className="px-4 py-3 border-b flex justify-between items-center">
 
-window.SpeechRecognition||
-window.webkitSpeechRecognition;
+            <div className="flex items-center gap-3">
 
+              <div className="w-9 h-9 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 flex justify-center items-center">
+                <Sparkles size={15} className="text-white" />
+              </div>
 
-const recognition=
-new SpeechRecognition();
+              <div>
+                <p className="font-semibold text-zinc-800 dark:text-white">
+                  Kasparo Assistant
+                </p>
+                <p className="text-xs text-green-500">● Online</p>
+              </div>
 
+            </div>
 
-/*
-important fix
-*/
+            <button onClick={() => { stopSpeaking(); setOpen(false); }}>
+              <Minimize2 size={18} />
+            </button>
 
-recognition.lang=
-"en-IN";
+          </div>
 
+          {/* BODY */}
 
-recognition.continuous=
-false;
+          <div className="p-4 flex flex-col gap-3">
 
-recognition.interimResults=
-false;
+            {/* SPEAK BUTTON */}
 
-recognition.maxAlternatives=
-1;
+            <button
+              onClick={startListening}
+              disabled={loading || speaking}
+              className="w-full h-12 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-medium flex justify-center items-center gap-2 disabled:opacity-60"
+            >
+              {loading ? (
+                "Analyzing..."
+              ) : listening ? (
+                <>
+                  <MicOff />
+                  Listening...
+                </>
+              ) : (
+                <>
+                  <Mic />
+                  Tap to Speak
+                </>
+              )}
+            </button>
 
+            {/* STOP BUTTON — only visible while speaking */}
 
-setListening(true);
+            {speaking && (
+              <button
+                onClick={stopSpeaking}
+                className="w-full h-12 rounded-xl border border-red-400 dark:border-red-500 text-red-500 dark:text-red-400 font-medium flex justify-center items-center gap-2 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+              >
+                <StopCircle size={18} />
+                Stop Speaking
+              </button>
+            )}
 
+            {/* TRANSCRIPT */}
 
+            {question && (
+              <div className="mt-1 rounded-xl bg-zinc-100 dark:bg-zinc-900 px-4 py-3">
+                <p className="text-xs text-zinc-400">You</p>
+                <p>"{question}"</p>
+              </div>
+            )}
 
-recognition.onresult=
-async(e)=>{
+          </div>
 
-const text=
-e.results[0][0]
-.transcript;
+        </div>
 
+      )}
 
-setQuestion(
-text
-);
-
-
-const user=
-JSON.parse(
-
-sessionStorage
-.getItem(
-"user"
-)
-
-);
-
-
-try{
-
-setLoading(
-true
-);
-
-
-const data=
-await askVoiceAI(
-
-user.storeId,
-
-text
-
-);
-
-
-if(data){
-
-speak(
-data.answer,
-text
-);
-
-}
-
-}
-catch(error){
-
-console.log(
-error
-);
-
-}
-
-
-setListening(false);
-
-setLoading(false);
-
-};
-
-
-
-recognition.onerror=
-()=>{
-
-setListening(false);
-
-setLoading(false);
-
-};
-
-
-recognition.onend=
-()=>{
-
-setListening(false);
-
-};
-
-
-recognition.start();
-
-};
-
-
-
-return(
-
-<div
-className="
-fixed
-bottom-6
-right-6
-z-50
-"
->
-
-{
-!open&&
-
-<button
-onClick={
-openAssistant
-}
-
-className="
-
-h-14
-px-5
-
-rounded-full
-
-bg-white
-
-dark:bg-zinc-900
-
-shadow-xl
-
-border
-
-border-zinc-200
-
-dark:border-zinc-800
-
-flex
-items-center
-gap-3
-
-hover:scale-105
-transition-all
-
-"
-
->
-
-<div
-
-className="
-
-w-8
-h-8
-
-rounded-full
-
-bg-gradient-to-r
-
-from-violet-600
-to-indigo-600
-
-flex
-items-center
-justify-center
-
-"
-
->
-
-<Sparkles
-size={16}
-className="
-text-white
-"
-/>
-
-</div>
-
-<div className="flex flex-col leading-tight">
-
-<span
-className="
-font-medium
-text-zinc-700
-dark:text-white
-"
->
-Saarthi Assist
-</span>
-
-<div className="text-[10px] text-slate-500 dark:text-zinc-500 transition-colors duration-300">
-Your personalized voice assistant
-</div>
-
-</div>
-</button>
-
-}
-
-
-
-{
-open&&
-
-<div
-
-className="
-
-w-[320px]
-
-bg-white
-
-dark:bg-[#171717]
-
-rounded-[24px]
-
-border
-
-border-zinc-200
-
-dark:border-zinc-800
-
-shadow-2xl
-
-overflow-hidden
-
-"
-
->
-
-<div
-className="
-px-4
-py-3
-
-border-b
-
-flex
-justify-between
-items-center
-"
->
-
-<div
-className="
-flex
-items-center
-gap-3
-"
->
-
-<div
-
-className="
-
-w-9
-h-9
-
-rounded-full
-
-bg-gradient-to-r
-
-from-violet-600
-to-indigo-600
-
-flex
-justify-center
-items-center
-
-"
-
->
-
-<Sparkles
-size={15}
-className="
-text-white
-"
-/>
-
-</div>
-
-<div>
-
-<p
-className="
-font-semibold
-text-zinc-800
-dark:text-white
-"
->
-
-Kasparo Assistant
-
-</p>
-
-<p
-className="
-text-xs
-text-green-500
-"
->
-
-● Online
-
-</p>
-
-</div>
-
-</div>
-
-<button
-onClick={()=>
-setOpen(false)
-}
->
-
-<Minimize2
-size={18}
-/>
-
-</button>
-
-</div>
-
-<div className="p-4">
-
-<button
-
-onClick={
-startListening
-}
-
-disabled={
-loading
-}
-
-className="
-
-w-full
-
-h-12
-
-rounded-xl
-
-bg-gradient-to-r
-
-from-violet-600
-to-indigo-600
-
-text-white
-
-font-medium
-
-flex
-justify-center
-items-center
-gap-2
-
-"
-
->
-
-{
-
-loading ?
-
-"Analyzing..."
-
-:
-
-listening ?
-
-<>
-
-<MicOff/>
-
-Listening...
-
-</>
-
-:
-
-<>
-
-<Mic/>
-
-Tap to Speak
-
-</>
-
-}
-
-</button>
-
-
-{
-question&&
-
-<div
-className="
-mt-4
-
-rounded-xl
-
-bg-zinc-100
-dark:bg-zinc-900
-
-px-4
-py-3
-"
->
-
-<p
-className="
-text-xs
-text-zinc-400
-"
->
-
-You
-
-</p>
-
-<p>
-
-"{question}"
-
-</p>
-
-</div>
-
-}
-
-</div>
-
-</div>
-
-}
-
-</div>
-
-)
-
+    </div>
+  );
 }
 
 export default VoiceAssistant;

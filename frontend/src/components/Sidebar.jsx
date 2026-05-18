@@ -10,16 +10,20 @@ import {
 import {
   LayoutDashboard,
   Package,
-  BarChart2,
-  Sparkles,
+  BarChart3,
   Settings,
   ArrowRight,
   WandSparkles,
+  Sparkles,
+  BrainCircuit,
+  FlaskConical,
   Moon,
   Sun
-} from "lucide-react"
+} from "lucide-react";
 
 import { useTheme } from "../context/ThemeContext"
+
+import logosaarthi from "../assets/logosaarthi.png";
 
 import {
   Link,
@@ -56,75 +60,48 @@ function Sidebar() {
   // =====================================
 
   const navItems = [
-
     {
       name: "Dashboard",
-
-      icon:
-        LayoutDashboard,
-
-      path:
-        "/dashboard",
+      icon: LayoutDashboard,
+      path: "/dashboard",
     },
 
     {
       name: "Products",
-
-      icon:
-        Package,
-
-      path:
-        "/products",
+      icon: Package,
+      path: "/products",
     },
 
     {
-      name:
-        "AI Product Studio",
-
-      icon:
-        WandSparkles,
-
-      path:
-        "/ai-product-studio",
+      name: "AI Product Studio",
+      icon: WandSparkles,
+      path: "/ai-product-studio",
     },
 
     {
-      name:"AI Simulation",
-      icon:Sparkles,
-      path:"/simulation"
+      name: "AI Simulation",
+      icon: FlaskConical,
+      path: "/simulation",
     },
 
     {
       name: "Insights",
-
-      icon:
-        BarChart2,
-
-      path:
-        "/insights",
+      icon: BarChart3,
+      path: "/insights",
     },
 
     {
-      name:
-        "Recommendations",
-
-      icon:
-        Sparkles,
-
-      path:
-        "/recommendations",
+      name: "Recommendations",
+      icon: BrainCircuit,
+      path: "/recommendations",
     },
 
     {
       name: "Settings",
-
-      icon:
-        Settings,
-
-      path:
-        "/settings",
+      icon: Settings,
+      path: "/settings",
     },
-  ]
+  ];
 
   // =====================================
   // STORE INITIALS
@@ -154,37 +131,61 @@ function Sidebar() {
       {/* LOGO */}
 
       <div className="p-6">
+          <div className="flex items-center gap-3">
 
-        <div className="flex items-center gap-3">
+            <div className="
+              w-12 h-12
+              rounded-2xl
+              overflow-hidden
+              flex items-center justify-center
+              bg-zinc-100/70
+              dark:bg-zinc-900/60
+              border border-zinc-200
+              dark:border-zinc-800
+              backdrop-blur-sm
+              p-1
+              transition-all
+            ">
+              <img
+                src={logosaarthi}
+                alt="VYAPARsaarthi"
+                className="
+                  w-full h-full
+                  object-contain
+                  rounded-xl
+                "
+              />
+            </div>
 
-          <div className="bg-indigo-50 dark:bg-zinc-800 p-2.5 rounded-xl transition-colors duration-300">
+            <div>
+              <h1 className="text-lg font-bold leading-tight">
+                <span className="text-zinc-900 dark:text-white">
+                  VYAPAR
+                </span>
 
-            <Sparkles
-              size={20}
-              className="text-indigo-600 dark:text-indigo-400"
-            />
+                <span className="
+                  bg-gradient-to-r
+                  from-cyan-400
+                  via-blue-500
+                  to-violet-500
+                  bg-clip-text
+                  text-transparent
+                ">
+                  saarthi
+                </span>
+              </h1>
+
+              <p className="
+                text-xs
+                text-zinc-500
+                dark:text-zinc-400
+              ">
+                Smart Merchant Companion
+              </p>
+            </div>
 
           </div>
-
-          <div>
-
-            <h1 className="text-lg font-bold text-zinc-900 dark:text-white leading-tight">
-
-              VYAPARsaarthi
-
-            </h1>
-
-            <p className="text-xs text-zinc-500">
-
-              Smart Merchant Companion
-
-            </p>
-
-          </div>
-
         </div>
-
-      </div>
 
       {/* NAVIGATION */}
 

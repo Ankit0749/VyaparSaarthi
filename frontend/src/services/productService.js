@@ -1,67 +1,131 @@
+import axios from "axios";
+
+
 export const getProducts =
-  async (storeId) => {
+async(storeId)=>{
 
-  const res = await fetch(
-    `http://localhost:5000/api/products/store/${storeId}`
-  );
+const res=
+await fetch(
 
-  if (!res.ok) {
-    throw new Error(
-      "Failed to fetch products"
-    );
-  }
+`http://localhost:5000/api/products/store/${storeId}`
 
-  return res.json();
+);
+
+if(!res.ok){
+
+throw new Error(
+"Failed to fetch products"
+);
+
+}
+
+return res.json();
+
 };
 
-export const getSingleProduct =
-  async (id) => {
 
-  const res = await fetch(
-    `http://localhost:5000/api/products/${id}`
-  );
 
-  if (!res.ok) {
-    throw new Error(
-      "Failed to fetch product"
-    );
-  }
+export const getSingleProduct=
+async(id)=>{
 
-  return res.json();
+const res=
+await fetch(
+
+`http://localhost:5000/api/products/${id}`
+
+);
+
+if(!res.ok){
+
+throw new Error(
+"Failed to fetch product"
+);
+
+}
+
+return res.json();
+
 };
-export const analyzeProduct =
-  async (id) => {
 
-    const res = await fetch(
-      `http://localhost:5000/api/ai/analyze/${id}`,
-      {
-        method: "POST",
-      }
-    );
 
-    if (!res.ok) {
-      throw new Error(
-        "AI analysis failed"
-      );
-    }
 
-    return res.json();
-  };
-export const analyzeStoreProducts =
-  async (storeId) => {
+export const analyzeProduct=
+async(id)=>{
 
-    const res = await fetch(
-      `http://localhost:5000/api/ai/analyze-store/${storeId}`,
-      {
-        method: "POST",
-      }
-    );
+const res=
+await fetch(
 
-    if (!res.ok) {
-      throw new Error(
-        "Store analysis failed"
-      );
-    }
+`http://localhost:5000/api/ai/analyze/${id}`,
 
-    return res.json();
-  };
+{
+method:"POST"
+}
+
+);
+
+if(!res.ok){
+
+throw new Error(
+"AI analysis failed"
+);
+
+}
+
+return res.json();
+
+};
+
+
+
+export const analyzeStoreProducts=
+async(storeId)=>{
+
+const res=
+await fetch(
+
+`http://localhost:5000/api/ai/analyze-store/${storeId}`,
+
+{
+method:"POST"
+}
+
+);
+
+if(!res.ok){
+
+throw new Error(
+"Store analysis failed"
+);
+
+}
+
+return res.json();
+
+};
+
+
+
+export const updateProductWithAI=
+async(id)=>{
+
+try{
+
+const res=
+await axios.put(
+
+`http://localhost:5000/api/products/${id}/ai-update`
+
+);
+
+return res.data;
+
+}
+catch(error){
+
+console.log(error);
+
+throw error;
+
+}
+
+};
